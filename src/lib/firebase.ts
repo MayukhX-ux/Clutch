@@ -16,13 +16,17 @@ import {
 } from 'firebase/firestore';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 
+import firebaseConfigJson from '../../firebase-applet-config.json';
+
+const metaEnv = (import.meta as any).env || {};
+
 const firebaseConfig = {
-  apiKey: "AIzaSyAhas8mg1L8UIVf3WeR3eoP1bLwHbRZBp0",
-  authDomain: "clutch-509d7.firebaseapp.com",
-  projectId: "clutch-509d7",
-  storageBucket: "clutch-509d7.firebasestorage.app",
-  messagingSenderId: "983921779502",
-  appId: "1:983921779502:web:8b67375bea397332b050bf"
+  apiKey: (metaEnv.VITE_FIREBASE_API_KEY as string) || firebaseConfigJson.apiKey,
+  authDomain: (metaEnv.VITE_FIREBASE_AUTH_DOMAIN as string) || firebaseConfigJson.authDomain,
+  projectId: (metaEnv.VITE_FIREBASE_PROJECT_ID as string) || firebaseConfigJson.projectId,
+  storageBucket: (metaEnv.VITE_FIREBASE_STORAGE_BUCKET as string) || firebaseConfigJson.storageBucket,
+  messagingSenderId: (metaEnv.VITE_FIREBASE_MESSAGING_SENDER_ID as string) || firebaseConfigJson.messagingSenderId,
+  appId: (metaEnv.VITE_FIREBASE_APP_ID as string) || firebaseConfigJson.appId
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
