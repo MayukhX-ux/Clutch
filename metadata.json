@@ -1,0 +1,6 @@
+{
+  "name": "Clutch",
+  "description": "A high-performance, block-based workspace and document editor with integrated AI assistance, mimicking the visual style and utility of professional collaborative document platforms.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

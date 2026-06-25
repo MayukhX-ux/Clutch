@@ -1,0 +1,170 @@
+{
+  "entities": {
+    "page": {
+      "title": "Page",
+      "description": "Represents a workspace page/document containing a title, icons, cover and a list of ordered block IDs.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the page."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the page."
+        },
+        "icon": {
+          "type": "string",
+          "description": "Emoji icon representation."
+        },
+        "coverImage": {
+          "type": "string",
+          "description": "CSS background string or image URL."
+        },
+        "parentId": {
+          "type": "string",
+          "description": "Parent page ID for nested hierarchy."
+        },
+        "isFavorite": {
+          "type": "boolean",
+          "description": "Whether the page is starred."
+        },
+        "isTrash": {
+          "type": "boolean",
+          "description": "Whether the page is in the trash."
+        },
+        "createdAt": {
+          "type": "integer",
+          "description": "Epoch timestamp of page creation."
+        },
+        "updatedAt": {
+          "type": "integer",
+          "description": "Epoch timestamp of last update."
+        },
+        "blockIds": {
+          "type": "array",
+          "description": "Ordered list of block IDs belonging to this page."
+        }
+      },
+      "required": ["id", "title", "createdAt", "updatedAt"]
+    },
+    "block": {
+      "title": "Block",
+      "description": "A block of content inside a page.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the block."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of content block.",
+          "enum": ["text", "h1", "h2", "h3", "todo", "bullet", "number", "code", "callout", "quote", "divider", "image"]
+        },
+        "content": {
+          "type": "string",
+          "description": "Content of the block."
+        },
+        "properties": {
+          "type": "object",
+          "description": "Optional block settings like checked states, code language or image URL."
+        },
+        "updatedAt": {
+          "type": "integer",
+          "description": "Epoch timestamp of last block update."
+        }
+      },
+      "required": ["id", "type", "content"]
+    },
+    "presence": {
+      "title": "Presence",
+      "description": "Collaborator live presence tracking.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Session or user ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Collaborator guest name."
+        },
+        "color": {
+          "type": "string",
+          "description": "Hex or theme color string."
+        },
+        "activeBlockId": {
+          "type": "string",
+          "description": "The block ID currently focused by the collaborator."
+        },
+        "updatedAt": {
+          "type": "integer",
+          "description": "Epoch timestamp of presence keep-alive."
+        }
+      },
+      "required": ["id", "name", "color", "updatedAt"]
+    },
+    "task": {
+      "title": "Task",
+      "description": "Represents a daily task within the daily task manager.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the task."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the task."
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the task.",
+          "enum": ["todo", "in_progress", "completed", "backlog"]
+        },
+        "priority": {
+          "type": "string",
+          "description": "Priority load index.",
+          "enum": ["low", "medium", "high"]
+        },
+        "category": {
+          "type": "string",
+          "description": "Task classification group.",
+          "enum": ["work", "personal", "health", "finance", "learning", "other"]
+        },
+        "date": {
+          "type": "string",
+          "description": "Target date string in YYYY-MM-DD format."
+        },
+        "createdAt": {
+          "type": "integer",
+          "description": "Epoch timestamp of creation."
+        },
+        "updatedAt": {
+          "type": "integer",
+          "description": "Epoch timestamp of last update."
+        }
+      },
+      "required": ["id", "title", "status", "priority", "category", "date", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/tasks/{taskId}": {
+      "schema": "task",
+      "description": "Daily structured task items collection."
+    },
+    "/pages/{pageId}": {
+      "schema": "page",
+      "description": "Root workspace documents metadata collection."
+    },
+    "/pages/{pageId}/blocks/{blockId}": {
+      "schema": "block",
+      "description": "Collaborative subcollection containing block contents for granular real-time sync."
+    },
+    "/pages/{pageId}/presence/{presenceId}": {
+      "schema": "presence",
+      "description": "Subcollection to track active users currently viewing/editing the page."
+    }
+  }
+}
