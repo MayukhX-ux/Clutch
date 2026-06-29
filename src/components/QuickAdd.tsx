@@ -86,41 +86,49 @@ export default function QuickAdd({ onAddTask }: QuickAddProps) {
         <Plus className="w-6 h-6" />
       </button>
 
+      {/* Backdrop for mobile bottom sheet */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/45 dark:bg-black/70 z-35 backdrop-blur-xs sm:hidden" 
+          onClick={() => setIsOpen(false)} 
+        />
+      )}
+
       {/* Popover Card */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             id="quick-add-popover-card"
             ref={cardRef}
-            initial={{ opacity: 0, y: 15, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 15, scale: 0.95 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="fixed bottom-22 right-6 z-40 w-80 sm:w-96 bg-white dark:bg-[#1f1f1f] border border-zinc-200 dark:border-[#2d2d2d] rounded-xl shadow-2xl overflow-hidden flex flex-col font-sans"
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 100 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+            className="fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:w-full max-sm:rounded-t-2xl max-sm:rounded-b-none max-sm:border-b-0 max-sm:border-x-0 sm:bottom-22 sm:right-6 sm:w-96 sm:rounded-xl sm:border z-40 bg-white dark:bg-[#1f1f1f] border-zinc-200 dark:border-[#2d2d2d] shadow-2xl overflow-hidden flex flex-col font-sans"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 bg-zinc-50 dark:bg-[#1a1a1a] border-b border-zinc-100 dark:border-[#2d2d2d]">
+            <div className="flex items-center justify-between px-4 py-3.5 bg-zinc-50 dark:bg-[#1a1a1a] border-b border-zinc-100 dark:border-[#2d2d2d]">
               <div className="flex items-center gap-1.5">
                 <div className="p-1 rounded bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
                   <CheckCircle2 className="w-4 h-4" />
                 </div>
-                <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Quick Add Task</span>
-                <span className="text-[10px] font-bold text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded tracking-wide">GENERAL</span>
+                <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Quick Add Task</span>
+                <span className="text-[10px] font-extrabold text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded tracking-wide">GENERAL</span>
               </div>
               <button
                 id="quick-add-close-btn"
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-200 transition-colors"
+                className="p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-md text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-200 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="p-4 space-y-4">
+            <form onSubmit={handleSubmit} className="p-4 space-y-4 pb-8 sm:pb-4">
               {/* Task Description */}
               <div className="space-y-1.5">
-                <label htmlFor="quick-add-task-input" className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 tracking-wide uppercase">
+                <label htmlFor="quick-add-task-input" className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wide uppercase">
                   Task Title
                 </label>
                 <input
@@ -132,13 +140,13 @@ export default function QuickAdd({ onAddTask }: QuickAddProps) {
                   onChange={(e) => setContent(e.target.value)}
                   disabled={isLoading}
                   required
-                  className="w-full px-3 py-2 bg-zinc-50 dark:bg-[#252525] border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm text-zinc-800 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+                  className="w-full px-3 py-2 bg-zinc-50 dark:bg-[#252525] border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm text-zinc-800 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all font-medium"
                 />
               </div>
 
               {/* Deadline / Due Date */}
               <div className="space-y-1.5">
-                <label htmlFor="quick-add-date-input" className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 tracking-wide uppercase flex items-center gap-1">
+                <label htmlFor="quick-add-date-input" className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wide uppercase flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5" /> Due Date (Optional)
                 </label>
                 <input
@@ -148,20 +156,20 @@ export default function QuickAdd({ onAddTask }: QuickAddProps) {
                   onChange={(e) => setDueDate(e.target.value)}
                   disabled={isLoading}
                   style={{ colorScheme: 'dark light' }}
-                  className="w-full px-3 py-2 bg-zinc-50 dark:bg-[#252525] border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all cursor-pointer"
+                  className="w-full px-3 py-2 bg-zinc-50 dark:bg-[#252525] border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all cursor-pointer font-medium"
                 />
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-[#2d2d2d]">
-                <div className="flex items-center gap-1 text-[11px] text-zinc-400">
+              <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-[#2d2d2d]">
+                <div className="flex items-center gap-1 text-[11px] text-zinc-400 font-semibold">
                   <span className="font-mono bg-zinc-100 dark:bg-zinc-800 px-1 rounded">Enter</span> to save
                 </div>
                 <button
                   id="quick-add-submit-btn"
                   type="submit"
                   disabled={isLoading || !content.trim()}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-xs rounded-lg shadow transition-colors flex items-center gap-1.5"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-lg shadow transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   {isLoading ? (
                     <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -185,15 +193,15 @@ export default function QuickAdd({ onAddTask }: QuickAddProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="fixed bottom-6 right-26 z-50 flex items-center gap-2.5 px-4 py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-950 border border-zinc-800 dark:border-zinc-200 rounded-lg shadow-xl font-sans text-sm max-w-sm"
+            className="fixed max-sm:bottom-24 max-sm:left-4 max-sm:right-4 max-sm:max-w-none sm:bottom-6 sm:right-26 z-50 flex items-center gap-2.5 px-4 py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-950 border border-zinc-800 dark:border-zinc-200 rounded-lg shadow-xl font-sans text-sm max-w-sm"
           >
             <div className="p-1 rounded-full bg-emerald-500 text-white">
               <Check className="w-3.5 h-3.5 stroke-[3]" />
             </div>
             <div className="flex-1 truncate">
-              <span className="font-semibold">Added task:</span>{' '}
+              <span className="font-bold">Added task:</span>{' '}
               <span className="opacity-90 italic truncate block sm:inline">"{addedTaskTitle}"</span>
-              <span className="block text-[10px] opacity-75 mt-0.5">Saved to "General Tasks" page</span>
+              <span className="block text-[10px] opacity-75 mt-0.5 font-medium">Saved to "General Tasks" page</span>
             </div>
             <button
               id="quick-add-toast-close"

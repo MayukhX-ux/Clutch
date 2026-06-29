@@ -453,7 +453,7 @@ export default function CalendarView({
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-transparent">
       {/* Calendar Sub-Header */}
-      <div className="px-6 lg:px-8 py-4 border-b border-zinc-200 dark:border-white/8 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 bg-white/40 dark:bg-[#0c0c10]/20 backdrop-blur-md">
+      <div className="px-3 sm:px-6 lg:px-8 py-4 border-b border-zinc-200 dark:border-white/8 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 bg-white/40 dark:bg-[#0c0c10]/20 backdrop-blur-md">
         {/* Date Selector Navigation */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1 bg-white/60 dark:bg-white/5 p-1 border border-zinc-200 dark:border-white/10 rounded-lg shadow-sm shrink-0 backdrop-blur-xs">
@@ -511,7 +511,7 @@ export default function CalendarView({
       </div>
 
       {/* Advanced Filter Ribbon */}
-      <div className="px-6 lg:px-8 py-2.5 border-b border-zinc-200 dark:border-white/8 flex flex-wrap items-center gap-4 shrink-0 text-xs text-[#5f5e5b] dark:text-[#9b9a97] bg-white/20 dark:bg-[#0c0c10]/10 backdrop-blur-xs">
+      <div className="px-3 sm:px-6 lg:px-8 py-2.5 border-b border-zinc-200 dark:border-white/8 flex flex-wrap items-center gap-4 shrink-0 text-xs text-[#5f5e5b] dark:text-[#9b9a97] bg-white/20 dark:bg-[#0c0c10]/10 backdrop-blur-xs">
         <div className="flex items-center gap-1 font-semibold text-[#37352f] dark:text-[#ebebea]">
           <Filter className="w-3 h-3 text-[#91918e]" />
           <span>Filters:</span>

@@ -135,7 +135,7 @@ export default function Dashboard({ onSelectPage }: DashboardProps) {
   // AI Smart Scheduler State
   const [aiScheduleInput, setAiScheduleInput] = useState('');
   const [isAiScheduling, setIsAiScheduling] = useState(false);
-  const [aiScheduleFeedback, setAiScheduleFeedback] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [aiScheduleFeedback, setAiScheduleFeedback] = useState<{ text: string; type: 'success' | 'error'; taskDetails?: Task } | null>(null);
 
   // Load / Sync Tasks from Firestore with LocalStorage cache fallback
   useEffect(() => {
@@ -340,7 +340,8 @@ export default function Dashboard({ onSelectPage }: DashboardProps) {
 
         setAiScheduleFeedback({
           text: `✨ Auto-Scheduled task: "${newTask.title}" (${newTask.category.toUpperCase()}, Priority: ${newTask.priority.toUpperCase()}) for ${newTask.date}`,
-          type: 'success'
+          type: 'success',
+          taskDetails: newTask
         });
         setAiScheduleInput('');
       } else {
@@ -505,7 +506,7 @@ export default function Dashboard({ onSelectPage }: DashboardProps) {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-transparent px-6 lg:px-12 py-8 custom-scrollbar relative z-10">
+    <div className="flex-1 overflow-y-auto bg-transparent px-3 sm:px-6 lg:px-12 py-6 sm:py-8 custom-scrollbar relative z-10">
       {/* Landing Dashboard Header */}
       <div className="max-w-5xl mx-auto flex flex-col gap-8 animate-fade-in pb-16">
         
@@ -532,39 +533,59 @@ export default function Dashboard({ onSelectPage }: DashboardProps) {
         </div>
 
         {/* AI Smart Scheduler Bar */}
-        <div className="p-5 glass-panel rounded-xl flex flex-col gap-3 shadow-md">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100 dark:border-indigo-900/30">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-xs font-bold text-[#37352f] dark:text-[#ebebea] uppercase tracking-wider flex items-center gap-1.5">
-                AI Smart Scheduler
-              </h3>
-              <p className="text-[10px] text-[#787774] dark:text-[#9b9a97] leading-none mt-0.5 select-none font-medium">Let Gemini instantly schedule, categorize, and prioritize your objectives</p>
+        <div className="p-5 glass-panel rounded-xl flex flex-col gap-4 shadow-lg border-l-4 border-indigo-500/80 dark:border-indigo-500 relative overflow-hidden transition-all duration-300">
+          {/* Subtle decorative elements for a premium cognitive vibe */}
+          <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 dark:bg-indigo-400/5 rounded-full blur-xl pointer-events-none" />
+          
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-xl border border-indigo-100/60 dark:border-indigo-900/30 shadow-xs shrink-0">
+                <Sparkles className="w-4 h-4 animate-pulse text-indigo-500 dark:text-indigo-400" />
+              </div>
+              <div>
+                <h3 className="text-xs font-bold text-[#37352f] dark:text-[#ebebea] uppercase tracking-wider flex items-center gap-1.5 select-none">
+                  AI Smart Scheduler
+                  <span className="px-1.5 py-0.5 rounded-full bg-indigo-100/60 dark:bg-indigo-950/60 border border-indigo-200/40 dark:border-indigo-900/30 text-[9px] font-black text-indigo-600 dark:text-indigo-300 uppercase tracking-widest normal-case">Gemini-3.5 Active</span>
+                </h3>
+                <p className="text-[10px] text-[#787774] dark:text-[#9b9a97] leading-none mt-1 select-none font-medium">Let Gemini instantly schedule, categorize, and prioritize your objectives</p>
+              </div>
             </div>
           </div>
+
           <form
             onSubmit={handleAISchedule}
-            className="flex gap-2 items-center"
+            className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center bg-zinc-50/50 dark:bg-black/15 p-1 rounded-xl border border-zinc-200/60 dark:border-white/5"
           >
-            <input
-              type="text"
-              placeholder="e.g., Schedule a high-priority financial review next Friday"
-              value={aiScheduleInput}
-              onChange={(e) => setAiScheduleInput(e.target.value)}
-              disabled={isAiScheduling}
-              className="flex-1 bg-white dark:bg-[#191919] border border-zinc-200 dark:border-[#2c2c2c] rounded-lg px-3.5 py-2 text-xs text-[#37352f] dark:text-[#ebebea] placeholder-[#91918e] focus:outline-none focus:border-indigo-500 transition-colors disabled:opacity-50 font-medium"
-            />
+            <div className="flex-1 flex items-center min-w-0 px-2">
+              <Sparkles className="w-3.5 h-3.5 text-zinc-400 mr-2 shrink-0" />
+              <input
+                type="text"
+                placeholder="e.g., Schedule a high-priority financial review next Friday"
+                value={aiScheduleInput}
+                onChange={(e) => setAiScheduleInput(e.target.value)}
+                disabled={isAiScheduling}
+                className="flex-1 bg-transparent border-none outline-none py-2 text-xs text-[#37352f] dark:text-[#ebebea] placeholder-[#91918e] disabled:opacity-50 font-semibold focus:ring-0"
+              />
+              {aiScheduleInput && (
+                <button
+                  type="button"
+                  onClick={() => setAiScheduleInput('')}
+                  className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+            
             <button
               type="submit"
               disabled={isAiScheduling || !aiScheduleInput.trim()}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-[#efefee] dark:disabled:bg-[#2f2f2f] disabled:text-[#91918e] text-white text-xs font-bold rounded-lg transition-all active:scale-[0.98] shadow-sm shrink-0 flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-[#efefee] dark:disabled:bg-[#2f2f2f] disabled:text-[#91918e] text-white text-xs font-bold rounded-lg transition-all active:scale-[0.98] shadow-xs hover:shadow-md shrink-0 flex items-center justify-center gap-1.5 cursor-pointer"
             >
               {isAiScheduling ? (
                 <>
-                  <span className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                  <span>Scheduling...</span>
+                  <span className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin shrink-0" />
+                  <span>Analyzing Command...</span>
                 </>
               ) : (
                 <>
@@ -574,14 +595,101 @@ export default function Dashboard({ onSelectPage }: DashboardProps) {
               )}
             </button>
           </form>
+
+          {/* Quick interactive NLP suggestion chips */}
+          {!isAiScheduling && !aiScheduleFeedback && (
+            <div className="flex flex-wrap gap-1.5 select-none items-center">
+              <span className="text-[10px] text-[#91918e] font-bold uppercase tracking-wider mr-1">Suggestions:</span>
+              {[
+                { label: '📅 Weekly work review next Friday', text: 'Schedule a work review next Friday' },
+                { label: '🔴 High-priority budget tomorrow', text: 'Schedule a high-priority budget audit tomorrow' },
+                { label: '🟢 Healthy workout this weekend', text: 'Schedule a health and workout routine this Saturday' }
+              ].map((suggestion, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setAiScheduleInput(suggestion.text)}
+                  className="text-[10px] font-semibold px-2.5 py-1 rounded-lg border border-zinc-200/60 dark:border-white/5 bg-white/40 dark:bg-white/5 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/25 hover:border-indigo-300/60 dark:hover:border-indigo-900/30 text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-300 transition-all cursor-pointer shadow-2xs"
+                >
+                  {suggestion.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Styled disorganization-fix layout panels for scheduler feedback */}
           {aiScheduleFeedback && (
-            <motion.p
-              initial={{ opacity: 0, y: -5 }}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`text-[11px] font-semibold ${aiScheduleFeedback.type === 'success' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'}`}
+              className="mt-1"
             >
-              {aiScheduleFeedback.text}
-            </motion.p>
+              {aiScheduleFeedback.type === 'success' ? (
+                <div className="rounded-xl border border-emerald-100 dark:border-emerald-900/40 bg-emerald-50/30 dark:bg-emerald-950/5 p-4 flex flex-col gap-3 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold text-xs select-none">
+                      <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 text-xs shrink-0">✓</span>
+                      <span>Gemini Auto-Scheduled Successfully!</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAiScheduleFeedback(null)}
+                      className="text-[10px] font-bold text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer transition-colors"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+
+                  {aiScheduleFeedback.taskDetails && (
+                    <div className="bg-white/80 dark:bg-[#121216]/80 rounded-lg p-3 border border-zinc-200/60 dark:border-white/8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                        <span className="font-bold text-xs text-[#37352f] dark:text-[#ebebea] truncate">
+                          {aiScheduleFeedback.taskDetails.title}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
+                        {/* Category badge */}
+                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black tracking-tight bg-zinc-100 dark:bg-zinc-800 text-[#5f5e5b] dark:text-[#9b9a97] capitalize select-none">
+                          {getCategoryIcon(aiScheduleFeedback.taskDetails.category)}
+                          <span>{aiScheduleFeedback.taskDetails.category}</span>
+                        </div>
+                        {/* Priority badge */}
+                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider select-none ${
+                          aiScheduleFeedback.taskDetails.priority === 'high'
+                            ? 'bg-red-50 dark:bg-red-900/20 text-red-500 border border-red-100/60 dark:border-red-900/30'
+                            : aiScheduleFeedback.taskDetails.priority === 'medium'
+                            ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-500 border border-amber-100/60 dark:border-amber-900/30'
+                            : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-500 border border-zinc-200/40'
+                        }`}>
+                          {aiScheduleFeedback.taskDetails.priority}
+                        </span>
+                        {/* Date badge */}
+                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50/60 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 text-[9px] font-black border border-indigo-100/40 select-none">
+                          <Calendar className="w-3 h-3 shrink-0" />
+                          <span>{aiScheduleFeedback.taskDetails.date}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-xl border border-red-200/60 dark:border-red-900/40 bg-red-50/40 dark:bg-red-950/5 p-3.5 text-xs font-semibold text-red-500 flex items-start gap-2 shadow-2xs">
+                  <span className="shrink-0 text-sm">⚠️</span>
+                  <div className="flex-1">
+                    <p className="font-bold">NLP Recognition Failed</p>
+                    <p className="text-[10px] text-red-400 dark:text-red-500 font-medium mt-0.5">{aiScheduleFeedback.text}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAiScheduleFeedback(null)}
+                    className="text-[10px] text-zinc-400 hover:text-zinc-600 cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
+            </motion.div>
           )}
         </div>
 

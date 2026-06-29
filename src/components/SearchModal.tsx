@@ -176,11 +176,11 @@ export default function SearchModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-start justify-center pt-[12vh] px-4 animate-fade-in font-sans">
+    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-start justify-center sm:pt-[12vh] pt-[4vh] px-4 animate-fade-in font-sans">
       <div
         id="search-modal-container"
         ref={modalRef}
-        className="w-full max-w-xl bg-[#ffffff] dark:bg-[#191919] border border-[#e9e9e7] dark:border-[#2c2c2c] rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[550px]"
+        className="w-full max-w-xl bg-[#ffffff] dark:bg-[#191919] border border-[#e9e9e7] dark:border-[#2c2c2c] rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] sm:max-h-[550px]"
       >
         {/* Search Input Header */}
         <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[#e9e9e7] dark:border-[#2c2c2c]">

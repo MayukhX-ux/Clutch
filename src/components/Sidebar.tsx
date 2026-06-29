@@ -63,6 +63,13 @@ export default function Sidebar({
   const [showTrash, setShowTrash] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
+  const selectPage = (id: string | null | 'calendar' | 'profile') => {
+    onSelectPage(id);
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setIsOpen(false);
+    }
+  };
+
   const toggleExpand = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setExpandedPages(prev => ({ ...prev, [id]: !prev[id] }));
@@ -87,11 +94,11 @@ export default function Sidebar({
           id={`sidebar-page-${page.id}`}
           role="button"
           tabIndex={0}
-          onClick={() => onSelectPage(page.id)}
+          onClick={() => selectPage(page.id)}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
-              onSelectPage(page.id);
+              selectPage(page.id);
             }
           }}
           className={`w-full flex items-center justify-between py-1 px-2 rounded-md text-left transition-all text-[13px] cursor-pointer select-none ${
@@ -184,15 +191,12 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Collapsed floating menu button */}
-      {!isOpen && (
-        <button
-          id="sidebar-toggle-open"
-          onClick={() => setIsOpen(true)}
-          className="fixed top-4 left-4 z-40 p-1.5 bg-white/85 dark:bg-[#121216]/65 border border-zinc-200 dark:border-white/8 backdrop-blur-md rounded-md shadow-sm text-[#37352f] dark:text-[#ebebea] hover:bg-[#efefee] dark:hover:bg-[#2f2f2f] transition-all"
-        >
-          <Menu className="w-4 h-4" />
-        </button>
+      {/* Backdrop for mobile */}
+      {isOpen && (
+        <div
+          onClick={() => setIsOpen(false)}
+          className="fixed inset-0 bg-black/45 dark:bg-black/75 z-35 backdrop-blur-xs lg:hidden"
+        />
       )}
 
       {/* Sidebar container */}
@@ -206,7 +210,7 @@ export default function Sidebar({
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-[#e9e9e7] dark:border-white/8">
           <button
             id="sidebar-workspace-header"
-            onClick={() => onSelectPage(null)}
+            onClick={() => selectPage(null)}
             className="flex items-center gap-2 hover:opacity-80 active:opacity-60 transition-opacity text-left cursor-pointer focus:outline-none"
             style={{ height: '35px' }}
             title="Go to Workspace Landing Page"
@@ -308,7 +312,7 @@ export default function Sidebar({
           {/* Weekly Calendar Button */}
           <button
             id="sidebar-btn-calendar-view"
-            onClick={() => onSelectPage('calendar')}
+            onClick={() => selectPage('calendar')}
             className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-left transition-all ${
               activePageId === 'calendar'
                 ? 'bg-[#efefee] dark:bg-[#2f2f2f] text-[#37352f] dark:text-[#ebebea] font-bold'
@@ -338,7 +342,7 @@ export default function Sidebar({
                   <button
                     key={`fav-${page.id}`}
                     id={`sidebar-fav-${page.id}`}
-                    onClick={() => onSelectPage(page.id)}
+                    onClick={() => selectPage(page.id)}
                     className={`w-full flex items-center justify-between py-1 px-2.5 rounded-md text-left text-[13px] transition-colors ${
                       activePageId === page.id
                         ? 'bg-[#efefee] dark:bg-[#2f2f2f] text-[#37352f] dark:text-[#ebebea] font-semibold'
@@ -395,7 +399,7 @@ export default function Sidebar({
                       className="group flex items-center justify-between py-1 px-1.5 rounded-md text-[#5f5e5b] dark:text-[#9b9a97] hover:bg-[#efefee] dark:hover:bg-[#2f2f2f] text-[12px] transition-colors"
                     >
                       <button
-                        onClick={() => onSelectPage(page.id)}
+                        onClick={() => selectPage(page.id)}
                         className="flex-1 text-left truncate flex items-center gap-1.5"
                       >
                         <span className="shrink-0">{page.icon || '📄'}</span>
@@ -467,7 +471,7 @@ export default function Sidebar({
         {currentUser ? (
           <div 
             id="sidebar-profile-footer"
-            onClick={() => onSelectPage('profile')}
+            onClick={() => selectPage('profile')}
             className={`p-3 bg-[#fbfbfa] dark:bg-[#202020] border-t border-[#e9e9e7] dark:border-[#2c2c2c] flex items-center justify-between cursor-pointer hover:bg-[#efefee] dark:hover:bg-[#292929] transition-colors group ${
               activePageId === 'profile' ? 'bg-[#efefee] dark:bg-[#2c2c2c]' : ''
             }`}
@@ -502,7 +506,7 @@ export default function Sidebar({
         ) : (
           <div 
             id="sidebar-profile-footer"
-            onClick={() => onSelectPage('profile')}
+            onClick={() => selectPage('profile')}
             className={`p-3 bg-[#fbfbfa] dark:bg-[#202020] border-t border-[#e9e9e7] dark:border-[#2c2c2c] flex items-center justify-between cursor-pointer hover:bg-[#efefee] dark:hover:bg-[#292929] transition-colors group ${
               activePageId === 'profile' ? 'bg-[#efefee] dark:bg-[#2c2c2c]' : ''
             }`}

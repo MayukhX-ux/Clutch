@@ -167,18 +167,24 @@ export default function Editor({
 
     // Subscribe to all presence docs in this page's subcollection
     const presenceCol = collection(db, 'pages', page.id, 'presence');
-    const unsubPresence = onSnapshot(presenceCol, (snapshot) => {
-      const list: any[] = [];
-      const now = Date.now();
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        // Clear stale presences (older than 15s) and ignore self
-        if (data.id !== collaborator.id && (now - (data.updatedAt || 0)) < 15000) {
-          list.push(data);
-        }
-      });
-      setActiveCollaborators(list);
-    });
+    const unsubPresence = onSnapshot(
+      presenceCol,
+      (snapshot) => {
+        const list: any[] = [];
+        const now = Date.now();
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          // Clear stale presences (older than 15s) and ignore self
+          if (data.id !== collaborator.id && (now - (data.updatedAt || 0)) < 15000) {
+            list.push(data);
+          }
+        });
+        setActiveCollaborators(list);
+      },
+      (error) => {
+        console.warn('Presence subscription failed (offline/permission issue):', error);
+      }
+    );
 
     return () => {
       clearInterval(keepAlive);
@@ -193,29 +199,35 @@ export default function Editor({
     if (!page.id || !db) return;
 
     const blocksCol = collection(db, 'pages', page.id, 'blocks');
-    const unsubBlocks = onSnapshot(blocksCol, async (snapshot) => {
-      // Upgrade existing pages to subcollection model on first view
-      if (snapshot.empty && page.blocks && page.blocks.length > 0 && !upgradedPages.current[page.id]) {
-        upgradedPages.current[page.id] = true;
-        console.log(`Upgrading page ${page.id} to collaborative subcollection blocks...`);
-        try {
-          for (const block of page.blocks) {
-            const blockRef = doc(db, 'pages', page.id, 'blocks', block.id);
-            await setDoc(blockRef, block);
+    const unsubBlocks = onSnapshot(
+      blocksCol,
+      async (snapshot) => {
+        // Upgrade existing pages to subcollection model on first view
+        if (snapshot.empty && page.blocks && page.blocks.length > 0 && !upgradedPages.current[page.id]) {
+          upgradedPages.current[page.id] = true;
+          console.log(`Upgrading page ${page.id} to collaborative subcollection blocks...`);
+          try {
+            for (const block of page.blocks) {
+              const blockRef = doc(db, 'pages', page.id, 'blocks', block.id);
+              await setDoc(blockRef, block);
+            }
+          } catch (err) {
+            console.error('Failed to upgrade blocks to subcollection', err);
           }
-        } catch (err) {
-          console.error('Failed to upgrade blocks to subcollection', err);
+          return;
         }
-        return;
-      }
 
-      const blocksMap: Record<string, Block> = {};
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data() as Block;
-        blocksMap[docSnap.id] = data;
-      });
-      setCollaborativeBlocks(blocksMap);
-    });
+        const blocksMap: Record<string, Block> = {};
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data() as Block;
+          blocksMap[docSnap.id] = data;
+        });
+        setCollaborativeBlocks(blocksMap);
+      },
+      (error) => {
+        console.warn('Blocks subscription failed (offline/permission issue):', error);
+      }
+    );
 
     return () => unsubBlocks();
   }, [page.id]);
@@ -886,7 +898,7 @@ export default function Editor({
       )}
 
       {/* Editor Content Area */}
-      <div className="flex-1 max-w-3xl w-full mx-auto px-6 lg:px-12 mt-4 relative z-10 flex flex-col">
+      <div className="flex-1 max-w-3xl w-full mx-auto px-3.5 sm:px-6 lg:px-12 mt-4 relative z-10 flex flex-col">
         
         {/* Live Collaborators Presence */}
         {activeCollaborators.length > 0 && (

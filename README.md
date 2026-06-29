@@ -88,10 +88,6 @@ Follow these commands to configure and start the full-stack server locally:
    ```
 
 ---
-## Deployed App link
-https://clutch-411447631161.asia-east1.run.app
-
----
 
 ## 🔒 Security Best Practices
 

@@ -29,6 +29,7 @@ import QuickAdd from './components/QuickAdd';
 import LaunchTaskModal from './components/LaunchTaskModal';
 import CalendarView from './components/CalendarView';
 import PersonalDetails from './components/PersonalDetails';
+import SplashScreen from './components/SplashScreen';
 import { Page, Block, Task } from './types';
 import { getInitialTemplates } from './templates';
 import {
@@ -49,9 +50,19 @@ import {
 } from './lib/firebase';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [pages, setPages] = useState<Page[]>([]);
   const [activePageId, setActivePageId] = useState<string | null | 'calendar' | 'profile'>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  // Auto-close sidebar on mobile/tablet screen sizes on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 1024) {
+        setIsSidebarOpen(false);
+      }
+    }
+  }, []);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
   const [isLaunchTaskOpen, setIsLaunchTaskOpen] = useState(false);
@@ -487,6 +498,10 @@ export default function App() {
 
   const activePage = pages.find((p) => p.id === activePageId) || null;
 
+  if (showSplash) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
+
   return (
     <div className="flex w-screen h-screen overflow-hidden bg-[#ffffff] dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors duration-200 relative">
       
@@ -536,14 +551,14 @@ export default function App() {
       <div className="flex-1 flex flex-col h-full overflow-hidden relative z-10">
         
         {/* Page Top Header controls */}
-        <header className="h-[45px] px-6 border-b border-[#e9e9e7] dark:border-white/10 flex items-center justify-between bg-white/70 dark:bg-[#0c0c10]/60 backdrop-blur-md shrink-0 relative z-20">
-          <div className="flex items-center gap-3">
-            {/* Sidebar toggle for large screens */}
+        <header className="h-[45px] px-3 sm:px-6 border-b border-[#e9e9e7] dark:border-white/10 flex items-center justify-between bg-white/70 dark:bg-[#0c0c10]/60 backdrop-blur-md shrink-0 relative z-20">
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
+            {/* Sidebar toggle for all screen sizes */}
             {!isSidebarOpen && (
               <button
                 id="header-toggle-sidebar"
                 onClick={() => setIsSidebarOpen(true)}
-                className="p-1.5 rounded hover:bg-[#efefee] dark:hover:bg-[#2f2f2f] text-[#787774] dark:text-[#9b9a97]"
+                className="p-1.5 rounded hover:bg-[#efefee] dark:hover:bg-[#2f2f2f] text-[#787774] dark:text-[#9b9a97] shrink-0"
                 title="Open Sidebar"
               >
                 <Menu className="w-4 h-4" />
@@ -551,36 +566,39 @@ export default function App() {
             )}
             
             {/* Breadcrumb path tracking */}
-            <div className="flex items-center gap-2 text-sm text-[#787774] dark:text-[#9b9a97] font-medium select-none">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-[#787774] dark:text-[#9b9a97] font-medium select-none min-w-0">
               <button
                 id="header-breadcrumb-workspace"
                 onClick={() => setActivePageId(null)}
-                className="hover:text-[#37352f] dark:hover:text-[#ebebea] cursor-pointer transition-colors focus:outline-none"
+                className={`hover:text-[#37352f] dark:hover:text-[#ebebea] cursor-pointer transition-colors focus:outline-none truncate ${
+                  (activePage || activePageId === 'calendar' || activePageId === 'profile') ? 'hidden sm:inline-block' : 'inline-block'
+                }`}
                 title="Go to Workspace Landing Page"
               >
                 Workspace
               </button>
               {activePage && (
                 <>
-                  <span className="text-[#e9e9e7] dark:text-[#2c2c2c] select-none font-normal">/</span>
-                  <span className="text-[#37352f] dark:text-[#ebebea] font-semibold truncate max-w-[180px]">
-                    {activePage.icon ? <span className="mr-1">{activePage.icon}</span> : '📄'} {activePage.title || 'Untitled'}
+                  <span className="text-[#e9e9e7] dark:text-[#2c2c2c] select-none font-normal hidden sm:inline">/</span>
+                  <span className="text-[#37352f] dark:text-[#ebebea] font-bold sm:font-semibold truncate max-w-[110px] xs:max-w-[150px] sm:max-w-[180px] flex items-center gap-1">
+                    {activePage.icon ? <span className="shrink-0">{activePage.icon}</span> : <span className="shrink-0">📄</span>}
+                    <span className="truncate">{activePage.title || 'Untitled'}</span>
                   </span>
                 </>
               )}
               {activePageId === 'calendar' && (
                 <>
-                  <span className="text-[#e9e9e7] dark:text-[#2c2c2c] select-none font-normal">/</span>
-                  <span className="text-[#37352f] dark:text-[#ebebea] font-semibold truncate max-w-[180px] flex items-center gap-1.5">
-                    📅 Weekly Calendar
+                  <span className="text-[#e9e9e7] dark:text-[#2c2c2c] select-none font-normal hidden sm:inline">/</span>
+                  <span className="text-[#37352f] dark:text-[#ebebea] font-bold sm:font-semibold truncate max-w-[110px] sm:max-w-[180px] flex items-center gap-1.5">
+                    <span>📅</span> <span className="truncate">Calendar</span>
                   </span>
                 </>
               )}
               {activePageId === 'profile' && (
                 <>
-                  <span className="text-[#e9e9e7] dark:text-[#2c2c2c] select-none font-normal">/</span>
-                  <span className="text-[#37352f] dark:text-[#ebebea] font-semibold truncate max-w-[180px] flex items-center gap-1.5">
-                    👤 Personal Profile
+                  <span className="text-[#e9e9e7] dark:text-[#2c2c2c] select-none font-normal hidden sm:inline">/</span>
+                  <span className="text-[#37352f] dark:text-[#ebebea] font-bold sm:font-semibold truncate max-w-[110px] sm:max-w-[180px] flex items-center gap-1.5">
+                    <span>👤</span> <span className="truncate">Profile</span>
                   </span>
                 </>
               )}
@@ -588,10 +606,10 @@ export default function App() {
           </div>
 
           {/* Header Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {/* Sync connection status indicator */}
             <div
-              className={`flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold tracking-wider select-none transition-all ${
+              className={`flex items-center gap-1 px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded text-[10px] sm:text-[11px] font-semibold tracking-wider select-none transition-all ${
                 isCloudSynced
                   ? 'bg-[#edf3ec] text-[#1c5a27]'
                   : 'bg-[#fbf3db] text-[#603b2c]'
@@ -601,12 +619,12 @@ export default function App() {
               {isCloudSynced ? (
                 <>
                   <Cloud className="w-3.5 h-3.5 text-[#1c5a27] shrink-0" />
-                  <span>Cloud Synced</span>
+                  <span className="hidden sm:inline">Synced</span>
                 </>
               ) : (
                 <>
                   <CloudLightning className="w-3.5 h-3.5 text-[#603b2c] shrink-0" />
-                  <span>Offline</span>
+                  <span className="hidden sm:inline">Offline</span>
                 </>
               )}
             </div>
@@ -730,7 +748,7 @@ export default function App() {
               <button
                 id="header-btn-profile"
                 onClick={() => setActivePageId('profile')}
-                className="flex items-center gap-1.5 p-1 pl-1 pr-2.5 rounded-full hover:bg-zinc-100 dark:hover:bg-[#2c2c2c] text-[#37352f] dark:text-[#ebebea] transition-all border border-zinc-200 dark:border-zinc-800 shrink-0 cursor-pointer"
+                className="flex items-center gap-1.5 p-1 pl-1 pr-1 sm:pr-2.5 rounded-full hover:bg-zinc-100 dark:hover:bg-[#2c2c2c] text-[#37352f] dark:text-[#ebebea] transition-all border border-zinc-200 dark:border-zinc-800 shrink-0 cursor-pointer"
                 title="View Personal Details"
               >
                 {currentUser.photoURL ? (
@@ -753,11 +771,11 @@ export default function App() {
               <button
                 id="header-btn-login"
                 onClick={handleGoogleLogin}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-lg text-xs font-bold shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer"
+                className="flex items-center gap-1 px-2 py-1 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-lg text-xs font-bold shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer animate-fade-in"
                 title="Sign In with Google"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span>Connect Google</span>
+                <span className="hidden sm:inline">Connect Google</span>
               </button>
             )}
           </div>
